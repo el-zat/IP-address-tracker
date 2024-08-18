@@ -1,21 +1,28 @@
 import L from 'leaflet'
-import { validateIp, addTileLayer } from './helpers/index.js'
-
+import { validateIp, addTileLayer, getAddress } from './helpers/index.js'
 import icon from '../images/icon-location.svg'
-
+// import myIp from 'ip'
 
 const ipInput = document.querySelector('.search-bar__input')
 const btn = document.querySelector('button')
-
-btn.addEventListener('click', getData)
-ipInput.addEventListener('keydown', handleKey)
-
 const ipInfo = document.querySelector('#ip')
 const locationInfo = document.querySelector('#location')
 const timezoneInfo = document.querySelector('#timezone')
 const ispInfo = document.querySelector('#isp')
-
 const mapArea = document.querySelector('.map')
+// const localIp = myIp.address()
+// const localIp =  require('ip')
+
+btn.addEventListener('click', getData)
+ipInput.addEventListener('keydown', handleKey)
+// document.addEventListener('DOMContentLoaded', setLocalData(localIp))
+
+// function setLocalData(localIp) {
+// 	const url = `https://geo.ipify.org/api/v2/country,city?apiKey=at_HGmGYtc5clmlXfeTWrt4VyIFKA4mY&ipAddress=${localIp}`;
+// 	fetch(url)
+// 		.then((responce) => responce.json())
+// 		.then((data) => setInfo(data));
+// }
 
 
 // initialize the map on the "map" div with a given center and zoom - code from docu
@@ -31,10 +38,9 @@ function getData(){
      */
 
     if (validateIp(ipInput.value)) {
-        fetch(`https://geo.ipify.org/api/v2/country?apiKey=at_HGmGYtc5clmlXfeTWrt4VyIFKA4mY&ipAddress=${ipInput.value}`)
-        .then(response => response.json())
-        .then(data => setInfo(data))
-
+        getAddress(ipInput.value)
+        .then(setInfo)
+    
         console.log(ipInput.value)
     }
 }
@@ -47,14 +53,20 @@ function handleKey(event) {
 
 function setInfo(mapData) {
     /**
-     * data received from output json are set into the HTML template
+     * Data received from output json are set into the HTML template
+     * Set the location marker on the map
      */
-
     console.log(mapData)
+
+    const {lat, lng, country, region, timezone} = mapData.location
+
     ipInfo.innerHTML = mapData.ip
-    locationInfo.innerHTML = mapData.location.country + ", " + mapData.location.region
-    timezoneInfo.innerHTML = mapData.location.timezone
+    locationInfo.innerHTML = country + ", " + region
+    timezoneInfo.innerHTML = timezone
     ispInfo.innerHTML = mapData.isp
+
+    map.setView([lat, lng])
+    L.marker([lat, lng], {icon: markerIcon}).addTo(map)
 }
 
 addTileLayer(map)
