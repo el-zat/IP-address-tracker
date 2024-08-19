@@ -1,5 +1,0 @@
-export function addOffset(map){
-    const offsetY = map.getSize().y * 0.1
-    
-    map.panBy([0.1, -offsetY], {animate: false})
-}
