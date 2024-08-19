@@ -1,7 +1,7 @@
 import L from 'leaflet'
-import { validateIp, addTileLayer, getAddress } from './helpers/index.js'
+import { validateIp, addTileLayer, getAddress, addOffset } from './helpers/index.js'
 import icon from '../images/icon-location.svg'
-// import myIp from 'ip'
+
 
 const ipInput = document.querySelector('.search-bar__input')
 const btn = document.querySelector('button')
@@ -10,19 +10,20 @@ const locationInfo = document.querySelector('#location')
 const timezoneInfo = document.querySelector('#timezone')
 const ispInfo = document.querySelector('#isp')
 const mapArea = document.querySelector('.map')
-// const localIp = myIp.address()
-// const localIp =  require('ip')
+
 
 btn.addEventListener('click', getData)
 ipInput.addEventListener('keydown', handleKey)
-// document.addEventListener('DOMContentLoaded', setLocalData(localIp))
+document.addEventListener('DOMContentLoaded', setLocalData())
 
-// function setLocalData(localIp) {
-// 	const url = `https://geo.ipify.org/api/v2/country,city?apiKey=at_HGmGYtc5clmlXfeTWrt4VyIFKA4mY&ipAddress=${localIp}`;
-// 	fetch(url)
-// 		.then((responce) => responce.json())
-// 		.then((data) => setInfo(data));
-// }
+async function setLocalData() {
+    const resp = await fetch('http://checkip.amazonaws.com');
+    const localIp = await resp.text();
+	const url = `https://geo.ipify.org/api/v2/country,city?apiKey=at_HGmGYtc5clmlXfeTWrt4VyIFKA4mY&ipAddress=${localIp}`;
+	fetch(url)
+		.then((responce) => responce.json())
+		.then((data) => setInfo(data));
+}
 
 
 // initialize the map on the "map" div with a given center and zoom - code from docu
@@ -67,10 +68,15 @@ function setInfo(mapData) {
 
     map.setView([lat, lng])
     L.marker([lat, lng], {icon: markerIcon}).addTo(map)
+
+    // add offset for marker only on mobile and tablet size
+    if (matchMedia("(max-width: 1023px)").matches) {    //The Window interface's matchMedia() method returns a new MediaQueryList object that can then be used to determine if the document matches the media query string, as well as to monitor the document to detect when it matches (or stops matching) that media query.
+        addOffset(map)
+    }  
 }
 
 addTileLayer(map)
-L.marker([51.505, -0.09])
+//L.marker([51.505, -0.09])
 
 // create an own icon - based on the code from leaflet docu
 const markerIcon = L.icon({
@@ -83,5 +89,7 @@ const markerIcon = L.icon({
 });
 
 
-// put a marker with this icon on a map:
-L.marker([51.5, -0.09], {icon: markerIcon}).addTo(map);
+
+
+
+
