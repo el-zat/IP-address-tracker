@@ -17,7 +17,7 @@ ipInput.addEventListener('keydown', handleKey)
 document.addEventListener('DOMContentLoaded', setLocalData())
 
 async function setLocalData() {
-    const resp = await fetch('http://checkip.amazonaws.com');
+    const resp = await fetch('https://checkip.amazonaws.com');
     const localIp = await resp.text();
 	const url = `https://geo.ipify.org/api/v2/country,city?apiKey=at_HGmGYtc5clmlXfeTWrt4VyIFKA4mY&ipAddress=${localIp}`;
 	fetch(url)
